@@ -1,0 +1,5 @@
+logs/
+git_diff.txt
+delivery_archive.zip
+.DS_Store
+.vscode
