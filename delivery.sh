@@ -1,9 +1,13 @@
 #!/bin/bash
 
+item_number=Item_$1
+docker_instance_id=${2:0:12}
+openhands_container_name=openhands-app
+
 # Function to check if container exists and is running
 check_container() {
-    if ! docker ps | grep -q openhands-app; then
-        echo "Error: OpenHands container is not running"
+    if ! docker ps | grep -q $docker_instance_id; then
+        echo "Error: Container $docker_instance_id is not running"
         exit 1
     fi
 }
@@ -30,7 +34,7 @@ is_file_empty() {
 check_container
 
 # Create necessary directories
-mkdir -p logs
+mkdir -p $item_number
 
 # Copy logs from the OpenHands container
 echo "Copying logs from OpenHands container..."
@@ -40,41 +44,59 @@ for file in $files; do
     # Get just the filename without the path
     filename=$(basename "$file")
     # Copy the file to logs directory
-    docker cp "openhands-app:$file" "./logs/$filename"
+    docker cp "openhands-app:$file" "./$item_number/$filename"
 done
 
 # Check if logs were copied successfully
-if ! is_dir_empty "./logs"; then
+if ! is_dir_empty "./$item_number"; then
     echo "Error: Failed to copy logs from container"
     exit 1
 fi
 
 # Get git diff from inside the container
 echo "Creating git diff file..."
-docker exec openhands-app git diff main > git_diff.txt
+# Find the non-hidden folder in workspace
+workspace_folder=$(docker exec $docker_instance_id find /workspace -maxdepth 1 -type d -not -path "/workspace" -not -path "/workspace/.*" | head -n 1)
+if [ -z "$workspace_folder" ]; then
+    echo "Error: No non-hidden folder found in workspace"
+    exit 1
+fi
+echo "Found workspace folder: $workspace_folder"
+docker exec $docker_instance_id bash -c "cd $workspace_folder && git diff main" > "./$item_number/git_diff.txt"
 
 # Check if git diff was successful
-if ! is_file_empty "git_diff.txt"; then
+if ! is_file_empty "./$item_number/git_diff.txt"; then
     echo "Error: Git diff is empty or failed"
     exit 1
 fi
 
 # Create zip archive
 echo "Creating delivery archive..."
-if ! zip -r delivery_archive.zip git_diff.txt logs/; then
+if ! zip -r "$item_number.zip" $item_number/; then
     echo "Error: Failed to create zip archive"
     exit 1
 fi
 
 # Cleanup prompt
-read -p "Do you want to clean up the logs folder? (y/n) " -n 1 -r
+read -p "Do you want to clean up the logs folder in the docker container? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-    echo "Cleaning up logs folder..."
+    echo "Cleaning up docker container logs folder..."
     docker exec openhands-app find /app/logs/llm -type f -delete
-    docker exec openhands-app rm git_diff.txt
-    echo "Cleanup complete!"
+
+    echo "Docker container cleanup complete!"
 fi
 
-echo "Delivery archive created: delivery_archive.zip" 
+# Cleanup prompt
+read -p "Do you want to clean up the item folder in this repository? (y/n) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    echo "Cleaning up item folder..."
+    rm -rf $item_number
+
+    echo "Repository cleanup complete!"
+fi
+
+echo "Delivery archive created: $item_number.zip" 
