@@ -1,6 +1,6 @@
 #!/bin/bash
 
-item_number=Item_$1
+item_number=$1
 docker_instance_id=${2:0:12}
 openhands_container_name=openhands-app
 
