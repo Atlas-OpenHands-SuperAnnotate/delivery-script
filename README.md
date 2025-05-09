@@ -3,7 +3,7 @@ Script for creating the archive for delivery containing logs and git diff.
 
 ## Usage
 
-First take the container id from the docker app, by copying the `ID` below the container name. Another way to get the container id is to run `docker ps` and copy the container id from the column `CONTAINER ID`. It has to be the `runtime` container. Example:
+First take the container id from the docker app, by copying the `ID` below the container name. Another way to get the container id is to run `docker ps` and copy the container id from the column `CONTAINER ID`. It has to be the `runtime` container. IMPORTANT, you might have different running instances for each of the conversations inside OpenHands. In this case, take the one that matches the conversation you are interested in. Example:
 
 ```bash
 > docker ps
@@ -14,9 +14,13 @@ CONTAINER ID   IMAGE                                                     COMMAND
 
 In this case the container id is `7b3591ae522f`.
 
-Using the Docker app:
+Another approach is to use the Docker app:
 
 ![image](https://github.com/user-attachments/assets/da7a1471-afc2-4c5e-b433-26b9672fbbce)
+
+In case you are not sure (because you have multiple runtime containers running), you can also take the ID by running `hostname` command in the terminal within vscode inside OpenHands:
+
+![image](https://github.com/user-attachments/assets/4f925487-7027-4687-bd72-07acbe2101d0)
 
 
 Then take the item number from the platform. This will be a number like `Item_00163`.
