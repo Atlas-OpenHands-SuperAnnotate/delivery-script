@@ -1,5 +1,6 @@
-logs/
-git_diff.txt
-delivery_archive.zip
 .DS_Store
 .vscode
+logs/
+git_diff.txt
+Item_*
+*.zip
