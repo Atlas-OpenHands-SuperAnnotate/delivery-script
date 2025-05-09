@@ -3,7 +3,7 @@ Script for creating the archive for delivery containing logs and git diff.
 
 ## Usage
 
-First take the container id from the docker app, by copying the `ID` below the container name. Another way to get the container id is to run `docker ps` and copy the container id from the column `ID`. It has to be the `runtime` container. Example:
+First take the container id from the docker app, by copying the `ID` below the container name. Another way to get the container id is to run `docker ps` and copy the container id from the column `CONTAINER ID`. It has to be the `runtime` container. Example:
 
 ```bash
 > docker ps
@@ -14,7 +14,14 @@ CONTAINER ID   IMAGE                                                     COMMAND
 
 In this case the container id is `7b3591ae522f`.
 
+Using the Docker app:
+
+![image](https://github.com/user-attachments/assets/da7a1471-afc2-4c5e-b433-26b9672fbbce)
+
+
 Then take the item number from the platform. This will be a number like `Item_00163`.
+
+With these 2 parameters, run the script:
 
 ```bash
 ./delivery.sh <item_number> <docker_instance_id>
