@@ -35,6 +35,13 @@ check_container
 
 # Create necessary directories
 mkdir -p $item_number
+mkdir -p $item_number/logs
+
+
+# Create a timestamped directory for backup 
+timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+docker exec openhands-app mkdir -p /app/logs_backup/$docker_instance_id
+docker exec openhands-app mkdir -p /app/logs_backup/$docker_instance_id/$timestamp
 
 # Copy logs from the OpenHands container
 echo "Copying logs from OpenHands container..."
@@ -44,7 +51,10 @@ for file in $files; do
     # Get just the filename without the path
     filename=$(basename "$file")
     # Copy the file to logs directory
-    docker cp "openhands-app:$file" "./$item_number/$filename"
+    docker cp "openhands-app:$file" "./$item_number/logs/$filename"
+    docker exec openhands-app mkdir -p /app/logs_backup
+    # Copy the file to the timestamped directory instead of directly to logs_backup
+    docker exec openhands-app mv "$file" /app/logs_backup/$docker_instance_id/$timestamp/
 done
 
 # Check if logs were copied successfully
@@ -75,28 +85,6 @@ echo "Creating delivery archive..."
 if ! zip -r "$item_number.zip" $item_number/; then
     echo "Error: Failed to create zip archive"
     exit 1
-fi
-
-# Cleanup prompt
-read -p "Do you want to clean up the logs folder in the docker container? (y/n) " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-    echo "Cleaning up docker container logs folder..."
-    docker exec openhands-app find /app/logs/llm -type f -delete
-
-    echo "Docker container cleanup complete!"
-fi
-
-# Cleanup prompt
-read -p "Do you want to clean up the item folder in this repository? (y/n) " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-    echo "Cleaning up item folder..."
-    rm -rf $item_number
-
-    echo "Repository cleanup complete!"
 fi
 
 echo "Delivery archive created: $item_number.zip" 
