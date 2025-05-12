@@ -3,25 +3,9 @@ Script for creating the archive for delivery containing logs and git diff.
 
 ## Usage
 
-First take the container id from the docker app, by copying the `ID` below the container name. Another way to get the container id is to run `docker ps` and copy the container id from the column `CONTAINER ID`. It has to be the `runtime` container. IMPORTANT, you might have different running instances for each of the conversations inside OpenHands. In this case, take the one that matches the conversation you are interested in. Example:
-
-```bash
-> docker ps
-CONTAINER ID   IMAGE                                                     COMMAND                  CREATED             STATUS             PORTS                                                                                                    NAMES
-45472c1cebf1   docker.all-hands.dev/all-hands-ai/openhands:0.37          "/app/entrypoint.sh …"   About an hour ago   Up About an hour   0.0.0.0:3000->3000/tcp                                                                                   openhands-app
-7b3591ae522f   docker.all-hands.dev/all-hands-ai/runtime:0.37-nikolaik   "/openhands/micromam…"   17 hours ago        Up About an hour   0.0.0.0:36088->36088/tcp, 0.0.0.0:44373->44373/tcp, 0.0.0.0:52232->52232/tcp, 0.0.0.0:56034->56034/tcp   openhands-runtime-36bea49dbd3a44d5926818c9a2fa86a4
-```
-
-In this case the container id is `7b3591ae522f`.
-
-Another approach is to use the Docker app:
-
-![image](https://github.com/user-attachments/assets/da7a1471-afc2-4c5e-b433-26b9672fbbce)
-
-In case you are not sure (because you have multiple runtime containers running), you can also take the ID by running `hostname` command in the terminal within vscode inside OpenHands:
+First take the docker_instance_id from the output of the `hostname` command in the terminal within vscode inside OpenHands:
 
 ![image](https://github.com/user-attachments/assets/4f925487-7027-4687-bd72-07acbe2101d0)
-
 
 Then take the item number from the platform. This will be a number like `Item_00163`.
 
@@ -37,7 +21,7 @@ With these 2 parameters, run the script:
 ## Example
 
 ```bash
- ./delivery.sh Item_00163 7b3591ae522f71af0b5407e5b395e47dc7a831694c0e345a2b112417bc6a2da5
+ ./delivery.sh Item_00163 7b3591ae522f71af
 ```
 
 ## Output
